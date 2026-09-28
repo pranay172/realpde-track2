@@ -3,7 +3,6 @@
 import argparse
 import json
 from pathlib import Path
-import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 METRICS = ["rel_l2_score", "tke_score", "mvpe_score", "sps_score"]
@@ -32,14 +31,14 @@ def main():
                 row, base = read(stride, updates), read(20, 600)
                 scores[fold] = row
                 deltas[fold] = {m: row[m] - base[m] for m in METRICS}
-            means = {m: float(np.mean([d[m] for d in deltas.values()])) for m in METRICS}
+            means = {m: sum(d[m] for d in deltas.values()) / len(deltas) for m in METRICS}
             passes = means["rel_l2_score"] >= .15 and means["sps_score"] >= .5 and all(
                 d[m] >= -limit for d in deltas.values()
                 for m, limit in [("rel_l2_score", .10), ("tke_score", .25), ("mvpe_score", .10), ("sps_score", .25)]
             )
             cells[f"stride{stride}_u{updates}"] = {"stride": stride, "updates": updates,
                 "scores": scores, "fold_deltas": deltas, "mean_delta": means,
-                "mean_sps": float(np.mean([d["sps_score"] for d in scores.values()])), "passes": bool(passes)}
+                "mean_sps": sum(d["sps_score"] for d in scores.values()) / len(scores), "passes": bool(passes)}
     passing = [k for k, v in cells.items() if v["passes"]]
     selected = None
     if passing:

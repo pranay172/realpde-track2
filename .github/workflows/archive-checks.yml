@@ -11,10 +11,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Check source, docs and environment snapshots
-        run: python3 scripts/check_archive.py
+        run: python3 -S -B scripts/check_archive.py
       - name: Check release payload and reachable history
-        run: python3 scripts/publication_audit.py
+        run: python3 -S -B scripts/publication_audit.py
       - name: Test release guards
-        run: python3 -m unittest discover -s tests -p test_publication_checks.py
-      - name: Test dependency-free protocol logic
-        run: python3 -m unittest discover -s tests -p test_sampling_study_summary.py
+        run: python3 -S -B -m unittest discover -s tests -p test_publication_checks.py
+      - name: Test dependency-free sampling selection logic
+        run: python3 -S -B -m unittest discover -s tests -p test_sampling_study_summary.py

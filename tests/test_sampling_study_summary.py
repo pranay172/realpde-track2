@@ -4,6 +4,8 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -16,6 +18,14 @@ SPEC.loader.exec_module(MODULE)
 
 
 class SamplingStudySummaryTests(unittest.TestCase):
+    def test_cli_imports_without_site_packages(self):
+        result = subprocess.run(
+            [sys.executable, "-I", "-S", "-B", str(Path(MODULE.__file__)), "--help"],
+            capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--initialization", result.stdout)
+
     def run_summary(self, effects, *, seed=0, candidate=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -38,6 +48,17 @@ class SamplingStudySummaryTests(unittest.TestCase):
                 MODULE.main()
             name = "summary.json" if seed == 0 else f"confirmation_seed{seed}.json"
             return json.loads((root / cfg["output"] / name).read_text())
+
+    def test_reports_paired_fold_means_and_accepts_exact_limits(self):
+        result = self.run_summary({
+            (20, 600): [[0]*4]*2,
+            (20, 1800): [[.125, -.25, .125, .25], [.375, .5, .375, .75]],
+        }, candidate="stride20_u1800")
+        cell = result["cells"]["stride20_u1800"]
+        self.assertEqual(cell["mean_delta"], dict(zip(MODULE.METRICS, [.25, .125, .25, .5])))
+        self.assertEqual(cell["mean_sps"], 36.5)
+        self.assertTrue(cell["passes"])
+        self.assertEqual(result["selected_for_seed1_confirmation"], "stride20_u1800")
 
     def test_tie_prefers_lower_budget_then_grid(self):
         result = self.run_summary({

@@ -25,7 +25,8 @@
     "Explicit CC BY-NC 4.0 notices for five adapted FNO files: two model modules and three submission wrappers",
     "Release guard for the five-file license inventory and separate rebuilt-checkpoint packaging instructions",
     "Reviewed README refresh, original illustrative artwork, and regression-tested local Markdown/HTML link checks",
-    "Cleaned historical whitespace; model/experiment Python ASTs unchanged"
+    "Removed sampling-summary NumPy dependency, regression-tested two-fold means, and isolated data-free CI from site packages",
+    "Cleaned historical whitespace; model/training/submission Python ASTs unchanged"
   ],
   "reproduction_status": "Source/config recipe retained; model artifacts absent; no fresh end-to-end rerun"
 }

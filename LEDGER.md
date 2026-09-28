@@ -22,7 +22,7 @@ exception plus GitHub no-reply addresses. No remote or push is authorized here.
 
 Final-review fixes: added CC BY-NC 4.0 attribution to the three standalone FNO
 wrappers and reconciled the five-file inventory; added release regression guards
-and a separate rebuilt-checkpoint packaging procedure. All 15 dependency-free
+and a separate rebuilt-checkpoint packaging procedure. All 15 local
 tests and archive/privacy checks pass; model/experiment ASTs and historical
 configs are unchanged. Ready as a source-only research archive, not a fresh
 model reproduction. See `PUBLICATION_AUDIT.md`; no publication was performed.
@@ -38,9 +38,18 @@ model, experiment, environment, remote, or publication changes.
 
 Final README pass: corrected streaming/input semantics, checkpoint provenance,
 floating-point equivalence, interval half-widths and archive contents. Added
-HTML-parser link validation and five regression tests; all 20 dependency-free
+HTML-parser link validation and five regression tests; all 20 local
 tests, 61 local-link checks and the 165-file publication audit pass. Reviewed
 artwork/generator unchanged; no model/config changes or fresh model rerun.
+
+Hosted CI fix: run `36424303385` passed archive/privacy checks and 16 release
+tests, but the four sampling-summary tests imported unavailable NumPy. Earlier
+local NumPy masked that dependency; the dependency-free claim was incorrect.
+Replaced the helper's two means with stdlib arithmetic; CI now uses `-S -B`.
+All 22 tests pass without site packages, including new isolated-import and
+paired-fold boundary tests; 400 synthetic summaries match the old implementation
+exactly. Model/training/submission logic and configs are unchanged. Fix committed
+locally; hosted verification awaits the owner's push. No new experiment.
 
 ## Maintenance rules
 
@@ -70,7 +79,7 @@ artwork/generator unchanged; no model/config changes or fresh model rerun.
 | Environment | Final shared snapshots tracked in `environment-locks/`: Python 3.10.20, 34 evaluator / 36 GPU packages. Checksums, dependency checks, offline sync dry-runs and CPU smoke tests passed; no fresh reinstall. Venv deletion left to user. |
 | Active experiment | None running; E033 has scored and is the official baseline |
 | Artifact cleanup | Earlier selective cleanup retained archives/models; subsequent user cleanup removed the entire artifacts directory and shared data. Historical [cleanup manifest](docs/ARTIFACT_CLEANUP_2026-09-27.md) no longer describes current retention. |
-| Next action | Archive code/config/results and environment snapshots; no new experiment planned. Reacquire data/checkpoints before attempting reproduction. Open ideas below are historical, not queued work. |
+| Next action | Owner to push the CI dependency fix and verify a new hosted run; no new experiment planned. Reacquire data/checkpoints before attempting reproduction. Open ideas below are historical, not queued work. |
 
 ## Active ideas
 
