@@ -1,0 +1,25 @@
+{
+  "data_root": "../RealPDE-Competition-Data",
+  "device": "cuda",
+  "experiment": "E003",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "metric_batch_size": 16,
+  "models": [
+    "persistence",
+    "sim_pretrain_cno",
+    "sim_pretrain_fno_fp16",
+    "sim_pretrain_transolver",
+    "sim_real_ft_cno",
+    "sim_real_ft_fno_fp16",
+    "sim_real_ft_transolver"
+  ],
+  "output": "artifacts/e003/no_adaptation_results.json",
+  "partitions": [
+    "val_re",
+    "val_aoa",
+    "val_joint"
+  ],
+  "progress_every": 100,
+  "seed": 0,
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt"
+}

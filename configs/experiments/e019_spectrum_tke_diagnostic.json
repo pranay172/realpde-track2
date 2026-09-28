@@ -1,0 +1,72 @@
+{
+  "experiment": "E019",
+  "seed": 0,
+  "hypothesis": "Frozen E004's local TKE deficit is either a systematic spatial high-frequency underprediction in temporal fluctuations, which would justify exactly one train-scaled binned log-spectrum auxiliary, or a non-spectral temporal mean/fluctuation amplitude/phase error, which would instead justify the identity-initialized dual-head mean/fluctuation decoder. The diagnostic may support neither.",
+  "comparator": "Frozen E004 packed FNO only; no retraining, blending, TTT, interval change, validation, complementary-fold evaluation, package, or submission.",
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "checkpoint_sha256": "75cc07b42bfeb74f2a204dde26650a7f07289c377e35bfe04356f5bbfb9d363c",
+  "train_partition": "train",
+  "forbidden_partitions": ["val_re", "val_aoa", "val_joint"],
+  "training_side_split": {
+    "calibration_nominal_re": [3750, 8850, 16500, 24150],
+    "calibration_expected_trajectories": 15,
+    "audit_expected_trajectories": 41,
+    "window_stride": 20,
+    "batch_size": 8,
+    "loader": "Read one released trajectory at a time, form only contiguous stride-20 windows from it, and batch those windows; this preserves trajectory membership without retaining the full train release in RAM.",
+    "selection_note": "Exactly reuse E006/E018's trajectory-disjoint train-only calibration Re set; audit is every remaining real_regime_v1/train trajectory."
+  },
+  "diagnostic": {
+    "physical_space": "u/v postprocessed using the official real mean/std; pressure is excluded",
+    "temporal_decomposition": "For error e=pred-target, report sum(e^2)=T*sum(mean_t(e)^2)+sum((e-mean_t(e))^2), separately full-domain/wake and u/v.",
+    "official_tke": "Organizer TKE map = 0.5*(var_t(u)+var_t(v)); energy ratio is sum(map_pred)/sum(map_target), amplitude ratio is ||map_pred||_2/||map_target||_2.",
+    "wake_region": {
+      "kind": "official_mvpe_bounding_rectangle",
+      "y_start_inclusive": 8,
+      "y_stop_exclusive": 25,
+      "x_start_inclusive": 13,
+      "x_stop_exclusive": 38,
+      "note": "The rectangle is the unambiguous bounding region of the official 32x64 MVPE probe coordinates y=8,10,...,24 and x=13,21,29,37; it is used for temporal/TKE-map breakdowns only, not a windowed wake FFT."
+    },
+    "spatial_spectrum": {
+      "field": "temporal fluctuations u'=u-mean_t(u), v'=v-mean_t(v), full 32x64 domain",
+      "transform": "numpy rfft2 over H/W; raw coefficient |F|^2 is Hermitian-weighted then divided by (H*W)^2, so summed energy equals mean_{t,h,w}(u'^2) or mean_{t,h,w}(v'^2)",
+      "frequency_units": "cycles per grid cell",
+      "energy_units": "physical velocity squared",
+      "radial_bin_count": 12,
+      "band_edges_cycles_per_grid_cell": [0.0, 0.125, 0.25, 0.7071067811865476],
+      "band_names": ["low", "mid", "high"],
+      "zero_mode": "Retain in fine radial bins and report separately, but exclude from named low/mid/high comparisons.",
+      "log_epsilon": 1e-12,
+      "per_window_log_error": "RMSE over u/v and the 12 binned log energies log(E+epsilon)."
+    }
+  },
+  "route_selection": {
+    "priority": "Select spectral_auxiliary only when every spectral gate passes; otherwise select dual_head only when at least one dual-head condition passes; otherwise select neither. Thresholds are fixed before output and never tuned after inspection.",
+    "spectral_auxiliary": {
+      "scope": "combined u/v, full-domain named spectrum bands",
+      "maximum_high_band_prediction_target_ratio": 0.9,
+      "minimum_low_minus_high_ratio": 0.1,
+      "minimum_tke_log_spectrum_spearman": 0.25,
+      "required_partitions": ["calibration", "audit"],
+      "criterion": "Both partitions must have high-band pred/target <= 0.90, low-band ratio minus high-band ratio >= 0.10, and positive Spearman(per-window official TKE Rel-L2, per-window binned-log-spectrum RMSE) >= 0.25. Pearson is reported but not a route gate."
+    },
+    "dual_head": {
+      "only_if_spectral_gate_fails": true,
+      "minimum_full_domain_fluctuation_sse_share": 0.6,
+      "tke_map_amplitude_ratio_underprediction_at_most": 0.9,
+      "tke_map_amplitude_ratio_overprediction_at_least": 1.1,
+      "required_partitions": ["calibration", "audit"],
+      "criterion": "If the spectral route fails, select dual_head when centered temporal fluctuation SSE share is >=0.60 on both partitions OR the full-domain combined TKE-map amplitude ratio is <=0.90 on both partitions OR >=1.10 on both partitions. The latter must retain its direction across both partitions."
+    },
+    "neither": "If neither locked route condition holds, do not train a spectrum auxiliary or a dual-head decoder from E019 evidence."
+  },
+  "evaluation": {
+    "device": "cuda",
+    "progress_every_batches": 50
+  },
+  "output": "artifacts/e019"
+}

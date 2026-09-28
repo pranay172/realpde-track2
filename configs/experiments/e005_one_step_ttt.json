@@ -1,0 +1,42 @@
+{
+  "experiment": "E005",
+  "seed": 0,
+  "hypothesis": "One SGD step on the cached previous (input, target) pair, using E004's physical u/v relative MSE and restoring the frozen E004 weights at every trajectory reset, will raise TKE above 70.497 without dropping Rel-L2 below 94.470 or MVPE below 94.893, and will keep Time at least 80.",
+  "comparator": "E004 no-adaptation packed FNO on the same real_regime_v1 validation stream",
+  "decision_criterion": {
+    "tke_must_exceed_e004": 70.497,
+    "rel_l2_min": 94.470,
+    "mvpe_min": 94.893,
+    "time_min": 80.0,
+    "rel_l2_mvpe_slack_vs_e004": 0.25,
+    "reported_not_gated": ["sps_score"]
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e005",
+  "adaptation": {
+    "name": "one_step_previous_window_sgd",
+    "optimizer": "SGD",
+    "learning_rate": 0.0001,
+    "momentum": 0.0,
+    "adapt_steps": 1,
+    "trainable": "all_parameters",
+    "batchnorm": "keep_eval_running_stats",
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12
+    },
+    "pairing": "cached previous input with revealed previous target",
+    "reset": "restore E004 weights, new optimizer, clear cached input"
+  },
+  "evaluation": {
+    "bounds": "none; official scorer default +/-5% prediction band",
+    "metric_batch_size": 16,
+    "progress_every": 100
+  }
+}

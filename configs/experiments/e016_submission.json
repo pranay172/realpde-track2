@@ -1,0 +1,24 @@
+{
+  "experiment": "E016",
+  "seed": 0,
+  "hypothesis": "A no-adaptation zip wrapping the E015 packed FNO and the E006 (0.025, 0.1) interval will pass the Track 2 archive/container contract. Local v1 quality is not a gate because E015 trained on those files.",
+  "comparator": "E007 archive contract; official quality only after Codabench",
+  "decision_criterion": {
+    "extracted_max_bytes": 256000000,
+    "must_contain_root_submission_py": true,
+    "bounds_on_every_step": true,
+    "adapt_loss": null,
+    "skip_validation_proxy": true,
+    "official_container_local_eval": true
+  },
+  "checkpoint": "artifacts/e015/fno_fp16.pth",
+  "checkpoint_sha256": "1e61d570bf941985d5caa0a033ada7c59a1d609c38eef918ae0058583ba73343",
+  "wrapper": "submission/e015/submission.py",
+  "interval": {
+    "alpha": 0.025,
+    "beta": 0.1,
+    "sigma_global": 0.0563870259
+  },
+  "output": "artifacts/e016",
+  "archive_name": "e016_candidate.zip"
+}

@@ -1,0 +1,28 @@
+{
+  "experiment": "E022",
+  "seed": 0,
+  "hypothesis": "A Track 2 submission candidate wrapping the full-release E021 packed dual-head FNO with zero-latency streaming mean-bias adaptation (gamma=0.90), physical fluctuation rescaling (1.5x), and high-coverage SPS bounds (alpha=0.02, beta=0.14) will pass all container and offline contract gates and raise official leaderboard score past 79+.",
+  "comparator": "E016 Codabench baseline (75.497)",
+  "decision_criterion": {
+    "extracted_max_bytes": 256000000,
+    "must_contain_root_submission_py": true,
+    "bounds_on_every_step": true,
+    "adapt_loss": null,
+    "skip_validation_proxy": true,
+    "official_container_local_eval": true
+  },
+  "checkpoint": "artifacts/e021/fno_dual_head_fp16.pth",
+  "checkpoint_sha256": "3d9a6b93b8634db08b303d220a6a5df48ef35beb84628d8456d8fddc6d903dfe",
+  "wrapper": "submission/e021/submission.py",
+  "adaptation": {
+    "gamma": 0.90,
+    "fluct_scale": 1.50
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14,
+    "sigma_global": 0.0563870259
+  },
+  "output": "artifacts/e022",
+  "archive_name": "e022_candidate.zip"
+}

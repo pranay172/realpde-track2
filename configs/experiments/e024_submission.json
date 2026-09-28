@@ -1,0 +1,42 @@
+{
+  "experiment": "E024",
+  "seed": 0,
+  "hypothesis": "A Track 2 submission candidate wrapping the full-release E021 packed dual-head FNO with emaV streaming variance-map adaptation (EMA of revealed previous-target temporal-variance maps, var_gamma=0.90, var_sigma=0.5, clip 0.2-5.0, first-window identity) plus the deployed mean-bias EMA (gamma=0.90) and frozen SPS bounds (alpha=0.02, beta=0.14) will pass all archive, local_eval, reset-replay, and official-container gates. Local leakage-safe evidence (E020 weights, identical adaptation code): val Rel-L2 94.094 / TKE 77.318 / MVPE 95.665 / SPS 36.450, +0.68 ms/step vs fixed mode.",
+  "comparator": "E022 Codabench baseline (76.499614)",
+  "decision_criterion": {
+    "extracted_max_bytes": 256000000,
+    "must_contain_root_submission_py": true,
+    "bounds_on_every_step": true,
+    "adapt_loss": null,
+    "skip_validation_proxy": true,
+    "official_container_local_eval": true,
+    "deployed_validation": {
+      "config": "configs/eval/e024_emav_e020.json",
+      "expected": {
+        "rel_l2_score": 94.094,
+        "tke_score": 77.318,
+        "mvpe_score": 95.665,
+        "sps_score": 36.450
+      },
+      "tolerance": 0.15
+    }
+  },
+  "checkpoint": "artifacts/e021/fno_dual_head_fp16.pth",
+  "checkpoint_sha256": "3d9a6b93b8634db08b303d220a6a5df48ef35beb84628d8456d8fddc6d903dfe",
+  "wrapper": "submission/e024/submission.py",
+  "adaptation": {
+    "gamma": 0.90,
+    "fluct_mode": "emav",
+    "var_gamma": 0.90,
+    "var_sigma": 0.5,
+    "var_min": 0.2,
+    "var_max": 5.0
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14,
+    "sigma_global": 0.0563870259
+  },
+  "output": "artifacts/e024",
+  "archive_name": "e024_candidate.zip"
+}

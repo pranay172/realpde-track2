@@ -1,0 +1,12 @@
+{
+  "experiment": "E031",
+  "base_config": "configs/experiments/e020_dual_head_fno.json",
+  "folds": ["real_regime_v1", "real_regime_complement_v1"],
+  "initializations": ["random", "checkpoint"],
+  "seeds": [0, 1],
+  "updates": 600,
+  "hypothesis": "Correct simulation initialization consistently improves deployed emaV forecasts over seeded random initialization.",
+  "gate": "Across both folds and both seeds: mean Rel-L2 gain >=0.15, no fold-average TKE drop >0.25, MVPE drop >0.10 or SPS drop >0.25. Otherwise retain random initialization. Timing is diagnostic only for identical architectures.",
+  "evaluation": "E029 emaV and frozen bounds; whole-trajectory held-out real data. Existing folds are development evidence, not untouched tests.",
+  "output": "artifacts/e031"
+}

@@ -1,0 +1,68 @@
+# Python caches and tooling
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Local environments and caches
+.venv/
+.venv-*/
+.cache/
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Competition data and model artifacts
+*.h5
+*.hdf5
+*.pth
+*.pt
+*.ckpt
+*.npy
+*.npz
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+/data/
+datasets/
+checkpoints/
+ckpts/
+
+# Keep the small organizer-provided examples required by the tracked v6 kit.
+!realpde_t2_starting_kit_v6/example_data/mean_std_real.pt
+!realpde_t2_starting_kit_v6/example_data/test_real/*.h5
+
+# Generated experiments and submission packages
+artifacts/
+outputs/
+results/
+runs/
+logs/
+wandb/
+tensorboard/
+build/
+dist/
+submissions/*.zip
+*.log
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# External organizer material: acquire locally, never commit to this snapshot
+realpde_*_starting_kit_*/
+competition_docs/
+ENVIRONMENT_SETUP_ARCHIVE.md
+LOCAL_INVENTORY.md

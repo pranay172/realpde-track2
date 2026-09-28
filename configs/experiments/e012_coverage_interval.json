@@ -1,0 +1,45 @@
+{
+  "experiment": "E012",
+  "seed": 0,
+  "eval_only": true,
+  "hypothesis": "Applying the train-only coverage-targeted E006-grid interval (0.025, 0.15), selected as maximum coverage among calibration candidates within 1.0 SPS of the E006 max, to frozen E004 will keep Rel-L2/TKE/MVPE within 0.01 of E004, keep Time at least 86, raise validation coverage above E006's 66.599%, and not drop SPS below 34.067.",
+  "comparator": "E006/E007 frozen E004 with (0.025, 0.1) on real_regime_v1 validation via local_bench_v1",
+  "decision_criterion": {
+    "point_score_tolerance": 0.01,
+    "e004": {
+      "rel_l2_score": 94.720,
+      "tke_score": 70.497,
+      "mvpe_score": 95.143
+    },
+    "e007_sps_score": 35.067,
+    "sps_max_drop_vs_e007": 1.0,
+    "sps_min": 34.067,
+    "e006_coverage": 0.665994,
+    "time_min": 86.0,
+    "accept_rule": "point scores within 0.01 of E004 and Time >= 86 and coverage > 0.665994 and SPS >= 34.067"
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "checkpoint_sha256": "75cc07b42bfeb74f2a204dde26650a7f07289c377e35bfe04356f5bbfb9d363c",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e012",
+  "interval": {
+    "alpha": 0.025,
+    "beta": 0.15,
+    "sigma_global": 0.0563870259,
+    "formula": "half_width = alpha * abs(point_prediction) + beta * sigma_global",
+    "selection": "max coverage among E006 calibration candidates with sps_score >= max(sps_score) - 1.0; ties break by smaller mean half-width, then smaller alpha, then smaller beta",
+    "source": "artifacts/e006/calibration.json candidates.calibration",
+    "replaced": {"alpha": 0.025, "beta": 0.1, "rule": "E006 maximum calibration SPS"}
+  },
+  "evaluation": {
+    "adaptation": "none",
+    "metric_batch_size": 16,
+    "progress_every": 100,
+    "point_predictions": "frozen E004; bounds only change SPS"
+  }
+}

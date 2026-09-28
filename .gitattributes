@@ -1,0 +1,11 @@
+# Preserve organizer/vendored starter-kit formatting as distributed.
+realpde_t2_starting_kit_v6/** -whitespace
+
+# Treat bundled examples and future model/data artifacts as binary.
+*.h5 binary
+*.hdf5 binary
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.npz binary
+*.zip binary

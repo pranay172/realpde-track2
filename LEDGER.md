@@ -1,0 +1,152 @@
+# Track 2 Experiment Ledger
+
+Last updated: 2026-09-28
+
+This is the live index of Track 2 state, experiments, ideas, and durable
+decisions. Detailed setups and results belong in `docs/`, reproducible controls
+in `configs/`, and generated outputs in ignored `artifacts/`.
+
+## Public snapshot — 2026-09-28
+
+Exported from the private development archive; source commit is recorded in
+`PUBLIC_SNAPSHOT.json`. Original experiment evidence below is historical.
+Removed organizer bundles, copied pages, local handoff/inventory, data/assets,
+and Git history. Source-only checks do not replace model/contract tests.
+See `EXTERNAL_DEPENDENCIES.md` and `PUBLICATION_AUDIT.md` for restoration and
+release boundaries. No new experiment or official score was produced.
+
+Public Git identity approved: Pranay Vandanapu, with the exact personal email
+in `PUBLIC_SNAPSHOT.json`. Fresh `main` history uses this identity; old private
+history is not imported. The audit allows only that explicit personal-email
+exception plus GitHub no-reply addresses. No remote or push is authorized here.
+
+## Maintenance rules
+
+- Use monotonic IDs: `E###` for experiments, `I###` for ideas, and `D###` for
+  decisions. Never reuse an ID; intentionally skipped IDs stay unused.
+- Reserve an experiment before its meaningful run, then replace the planned row
+  with its result and a link to the durable note.
+- Keep this file compact: one row per experiment, only genuinely active ideas,
+  and consolidated decisions. Do not duplicate result-note prose or Git history.
+- Preserve negative results and provenance. Put full config, split, seed,
+  environment, runtime, metrics, hashes, and limitations in the linked note.
+- Update the current state and next action after every substantive conversation,
+  attempted approach, submission, or changed assumption.
+
+## Current state
+
+| Item | State |
+|---|---|
+| Competition | Archived after user-reported competition end on 2026-09-27; historical starting kit v6 and results retained. |
+| Data | Shared competition data removed by user; historical release: 82 real trajectories, 81 valid, 100 simulation trajectories; exclude `train_real/7575_0.h5` on restoration. |
+| Validation | `real_regime_v1`: 56 train, 8 Re-only, 15 AoA-only, 2 joint holdout trajectories |
+| Accepted local recipe | E032 stride20/1800 + emaV, seed0 main fold: Rel-L2 94.448, TKE 77.114, MVPE 95.798, SPS 37.543. Seed1 confirms gains; small TKE tradeoff versus E020/600-update controls. |
+| Complement fold | E032 selected seed0: Rel-L2 96.121, TKE 76.471, MVPE 97.079, SPS 47.262 on 821 held-out windows; seed1 confirms. Local Time is not used to compare identical inference graphs. |
+| Best official | E033: final 77.615784; Rel-L2 93.614317, TKE 77.141376, MVPE 93.391126, Time 88.185671, SPS 32.109079; user-reported official result |
+| Reference submission | Historical E033 archive SHA-256 `50a5b3dc2550b4129eabfe917085e98aedceb0224188c21e269856ae60b6ba93`; archive removed with artifacts. E029 remains the historical comparator in tracked results. |
+| Official interpretation | E033 vs E029: +0.855611 final, +0.419151 Rel-L2, +2.110134 TKE, +0.419659 MVPE, +1.730908 SPS, −0.557739 Time. Combined training-recipe gains transferred; individual causes and the Time decline cannot be isolated from this server comparison. Gap to 80: 2.384216. |
+| Environment | Final shared snapshots tracked in `environment-locks/`: Python 3.10.20, 34 evaluator / 36 GPU packages. Checksums, dependency checks, offline sync dry-runs and CPU smoke tests passed; no fresh reinstall. Venv deletion left to user. |
+| Active experiment | None running; E033 has scored and is the official baseline |
+| Artifact cleanup | Earlier selective cleanup retained archives/models; subsequent user cleanup removed the entire artifacts directory and shared data. Historical [cleanup manifest](docs/ARTIFACT_CLEANUP_2026-09-27.md) no longer describes current retention. |
+| Next action | Archive code/config/results and environment snapshots; no new experiment planned. Reacquire data/checkpoints before attempting reproduction. Open ideas below are historical, not queued work. |
+
+## Active ideas
+
+E031/E032 passed; E033 improved all four official quality components. Do not treat full-data
+training evaluations as unseen quality evidence.
+
+| ID | Priority | Idea | Condition before opening an experiment |
+|---|---:|---|---|
+| I035 | P3 | One-pass fluctuation increment/correlation objective | Requires a train-side noise/coherence diagnostic first; temporal differencing may amplify PIV noise. |
+| I037 | P2 | Longer measured history via a small temporal module | If E032 plateaus, train with up to 100 observed frames, causal warm-up and trajectory resets. Distinct from rejected 20-frame AR donors. |
+| I036 | P1 | Feature-conditioned residual-quantile uncertainty head | Use the E032 point recipe and properly nested, train-only out-of-fold residuals; preserve outer holdouts. Distinct from rejected scalar, conformal-position, coverage-feedback, and target-variance heads. |
+| I019 | P2 | Frozen simulation FNO plus a small real residual module | Require a domain-alignment argument and a gate that addresses E027's simulation-induced TKE collapse. |
+| I011 | P2 | Low-gain previous-residual feedback | Revisit only with a stronger point model and train-only gain selection; prior residual autocorrelation was 0.053. |
+
+## Experiment index
+
+The referenced result note is authoritative for the full setup, metrics, hashes,
+and limitations. E028 was intentionally unused.
+
+| ID | Status | Outcome | Evidence |
+|---|---|---|---|
+| E000 | Complete | Established the dual CPU/GPU environments and passed starter-kit/checkpoint smoke tests. | Private inventory omitted; public environment pins in `environment-locks/` |
+| E001 | Complete | Pinned official container passed offline stream, reset, bounds, import, and checkpoint gates. | `container_smoke_test.py`; private inventory omitted |
+| E002 | Complete | Audited the release, proved the duplicate trajectory, and created leakage-safe manifests. | `docs/DATA_AUDIT.md` |
+| E003 | Complete | Reproduced persistence and all released baselines; selected packed FNO as the practical base. | `docs/BASELINE_RESULTS.md` |
+| E004 | Accepted | Split-safe FNO established the first leakage-safe learned baseline. | `docs/E004_RESULTS.md` |
+| E005 | Rejected | One-step full-model SGD TTT spent runtime without meaningful quality gain. | `docs/E005_RESULTS.md` |
+| E006 | Accepted | Train-only SPS calibration improved bounds without changing point predictions. | `docs/E006_RESULTS.md` |
+| E007 | Official 75.423409 | First validated submission package and official baseline. | `docs/E007_RESULTS.md` |
+| E008 | Rejected | Last-layer SGD TTT repeated E005's negligible quality/poor runtime tradeoff. | `docs/E008_RESULTS.md` |
+| E009 | Rejected | Longer FNO training gave insufficient gains for triple the budget. | `docs/E009_RESULTS.md` |
+| E010 | Accepted as evidence | Complementary holdout confirmed the training recipe on a different regime fold. | `docs/E010_RESULTS.md` |
+| E011 | Rejected | Channel-balanced/wake loss harmed Rel-L2 and MVPE. | `docs/E011_RESULTS.md` |
+| E012 | Accepted locally | Coverage-targeted static interval improved local SPS with identical points. | `docs/E012_RESULTS.md` |
+| E013 | Rejected | Score-aligned loss improved TKE but violated Rel-L2 preservation. | `docs/E013_RESULTS.md` |
+| E014 | Rejected | Train-scaled official loss missed Rel-L2/MVPE gates. | `docs/E014_RESULTS.md` |
+| E015 | Complete | Refit the accepted FNO recipe on all 81 valid real trajectories. | `docs/E015_RESULTS.md` |
+| E016 | Official 75.497 | Packaged E015; small official improvement over E007. | `docs/E016_RESULTS.md` |
+| E017 | Rejected | Online residual-scale uncertainty underperformed the static interval. | `docs/E017_RESULTS.md` |
+| E018 | Rejected | Static FNO/current-input blending failed its train-side TKE gate. | `docs/E018_RESULTS.md` |
+| E019 | Diagnostic | Located dominant fluctuation error and selected the dual-head route over spectral auxiliary loss. | `docs/E019_RESULTS.md` |
+| E020 | Accepted; provenance qualified | Dual-head FNO plus streaming state adaptation. Retained checkpoint counters 5,600 contradict E030's random-init inference; exact historical execution unresolved. Do not use as a random-init control. | `docs/E020_RESULTS.md` |
+| E021 | Complete; provenance corrected | Trained the full-data dual-head model used by E022/E029. The same packed-loader bug means it also started randomly rather than from the configured E004 checkpoint. | `docs/E021_RESULTS.md` |
+| E022 | Official 76.499614 | Validated full-data dual-head submission; historical baseline. | `docs/E022_RESULTS.md` |
+| E023 | Accepted | Per-pixel revealed-target variance EMA (emaV) improved local TKE and closed weaker mechanisms. | `docs/E023_RESULTS.md` |
+| E024 | Platform failure | Validated emaV package; Codabench later reported failure fetching the organizer ingestion bundle before participant execution. | `docs/E024_RESULTS.md` |
+| E025 | Rejected | Frozen-trunk linear variance head underperformed emaV on calibration. | `docs/E025_RESULTS.md` |
+| E026 | Rejected | Coverage feedback and current-input mean-map blending failed their gates. | `docs/E026_RESULTS.md` |
+| E027 | Rejected | Joint simulation/real fine-tuning collapsed TKE; positive-weight mixing is closed without alignment. | `docs/E027_RESULTS.md` |
+| E029 | Official 76.760173 | Hardened emaV submission scored successfully; TKE +6.638 and final +0.261 over E022. Historical comparator. | `docs/E029_RESULTS.md` |
+| E030 | Rejected | Pooled AR(2) gained only +0.082 Rel-L2 and lost −0.209 TKE; apparent composite gain came from impossible timing noise. The run produced the first strictly simulation-initialized dual-head complement model and fixed the packed-loader bug. | `docs/E030_RESULTS.md` |
+| E031 | Accepted recipe | Simulation initialization improves all quality metrics in all four fold/seed pairs: mean +0.217 Rel-L2, +2.081 TKE, +0.342 MVPE, +1.256 SPS. | `docs/E031_RESULTS.md` |
+| E032 | Accepted recipe | Both folds/seeds confirm stride20/1800: mean +0.275 Rel-L2, +0.157 MVPE, +0.928 SPS, −0.130 TKE. Dense/1800 fails complement TKE preservation. | `docs/E032_RESULTS.md` |
+| E033 | Official 77.615784 | New baseline: +0.856 final over E029; all four quality scores improved, Time −0.558. Unchanged wrapper; archive SHA prefix `50a5b3dc`. | `docs/E033_RESULTS.md` |
+
+## Submission history
+
+| Experiment | Official result | Package state |
+|---|---|---|
+| E007 | Final 75.423409 | Frozen historical baseline. |
+| E016 | Final 75.497 | Frozen historical baseline. |
+| E022 | Final 76.499614 | Previous official baseline. |
+| E024 | Failed before participant execution | Organizer `ingestion_program` bundle-fetch error; archive SHA prefix `708b9a74`. |
+| E029 | Final 76.760173 | Historical comparator; exact archive SHA prefix `bdf06b5a`. |
+| E033 | Final 77.615784 | Current best official result, supplied by user; exact archive SHA prefix `50a5b3dc`. |
+
+## Consolidated decisions
+
+| IDs | Durable decision |
+|---|---|
+| D001-D006 | Preserve the two shared environments; track the organizer kit but not generated assets; require alignment/reset tests; maintain this ledger; use the pinned offline container as the final compatibility gate. |
+| D007-D010 | Use versioned whole-trajectory regime splits, distinguish nominal and stored Reynolds numbers, exclude the duplicate real file, preserve model/data provenance labels, and use packed FNO as the size/runtime anchor. |
+| D011-D019 | Keep a frozen leakage-safe comparator. Full-model and last-layer one-step gradient TTT, simple longer training, and validation-directed retuning are closed without a structural change. |
+| D020-D027 | Alternative hand-weighted official losses and adaptive residual-scale intervals are closed on current evidence; full-real refits are evaluated officially rather than on reused local holdouts. |
+| D028-D034 | Static persistence blending and a spatial-spectrum auxiliary route were rejected. Adopt the dual-head mean/fluctuation architecture, streaming mean-bias correction, calibrated static bounds, and emaV; AR-donor and conformal-bound variants are closed. |
+| D035-D038 | E024/emaV is the strongest locally validated mechanism. Linear variance heads, coverage feedback, input mean blending, and unaligned joint simulation/real fine-tuning are closed. |
+| D039 | E029 is a hardened, numerically equivalent E024 resubmission; preserve its exact validated archive as the reference package. |
+| D040 | The failed E029 attempt was treated as evaluation-service evidence rather than a participant-code fault; preserving and retrying the exact archive led to the successful official row. |
+| D041 | Treat existing E020/E023 complement metrics as training-overlap diagnostics, not cross-fold evidence. |
+| D042 | Adopt E029 final 76.760173 as the official baseline. emaV transferred strongly on TKE (+6.638 vs E022) and raised final by +0.261; preserve the exact archive and target coherent fluctuation/field error next. |
+| D043 | The historical committed trainer had a packed-loader bug; require strict unpacked loading from E030 onward. E021 counters support random training, but E020 counters 5,600 contradict that blanket label. Preserve scores and distinguish source-code inference from checkpoint evidence. |
+| D044 | Reject E030 pooled AR(2): it failed the locked Rel-L2 and TKE gates, and the nominal composite gain was timing noise. Do not retune on the opened complement holdout; evaluate corrected initialization as a separate matched experiment. |
+| D045 | Seek balanced point/SPS improvements, but do not infer hidden composite weights from confounded submissions or claim component targets guarantee >80. E009 improved all quality components despite missing its gates; budget studies on the current dual-head recipe remain justified. |
+| D046 | E031 accepts verified simulation initialization: all four quality metrics improved on both folds and both seeds. Fresh matched runs establish the effect; historical E020 remains a separate quality anchor with qualified provenance. |
+| D047 | E032 accepts 1800 updates with trajectory-balanced stride20 sampling after two-fold/two-seed confirmation. Dense offsets do not pass the locked gates. Preserve the measured small TKE tradeoff and unchanged inference cost; refit as E033, not a claim of official >80. |
+| D048 | Promote E033 (77.615784) after +0.855611 official final gain and improvement in all quality scores. Freeze it as the next comparator; prioritize interval-only conditional uncertainty with nested out-of-fold training. Do not attribute the combined server gain to budget alone or infer hidden final-score weights. |
+
+## Closed approach families
+
+Do not reopen these with parameter-only variations; require a new mechanism or
+new evidence.
+
+| Family | Evidence |
+|---|---|
+| One-step gradient TTT | E005 and E008: negligible quality change with worse Time. |
+| Longer or reweighted versions of the original FNO loss | E009, E011, E013, E014: preservation gates failed or gains were too small. |
+| Adaptive uncertainty widths | E017, E023 conformal probe, and E026 coverage feedback: static calibrated bounds remained stronger. |
+| Direct current-input/persistence donors | E018, E023 AR probe, and E026 mean-map blend: TKE or MVPE degraded. |
+| Short-window autoregressive fluctuation donors | E023 per-pixel AR and E030 pooled AR(2): the 20-frame history is insufficient for stable phase gains; both lost TKE. |
+| Frozen linear variance prediction | E025: materially below emaV and even its zero-init behavior. |
+| Unaligned positive-weight simulation mixing | E027: severe TKE regression on the locked validation stream. |

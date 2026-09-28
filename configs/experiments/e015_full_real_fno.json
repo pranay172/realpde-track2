@@ -1,0 +1,76 @@
+{
+  "experiment": "E015",
+  "seed": 0,
+  "skip_eval": true,
+  "hypothesis": "Fine-tuning the E004 recipe on all 81 valid released real trajectories, holding every other E004 control fixed, will raise official Codabench Rel-L2 or MVPE versus E007 (93.780/91.190) or official final_score versus 75.423409, with Time still at least 86. Local v1_val is not a gate because those files are in the train set.",
+  "comparator": "E007 Codabench 93.779908 / 69.824232 / 91.189871 / 89.437108 / 26.777889 / final 75.423409",
+  "decision_criterion": {
+    "local_quality_gate": "none; v1_val and complement_val are contaminated",
+    "local_done": "training completes with finite loss, 81 files / 3341 windows, packed checkpoint under 256 MB",
+    "official_rel_l2_or_mvpe_min_gain_vs_e007": 0.30,
+    "official_final_min": 75.423409,
+    "time_min": 86.0,
+    "e007_codabench": {
+      "rel_l2_score": 93.779908,
+      "tke_score": 69.824232,
+      "mvpe_score": 91.189871,
+      "time_score": 89.437108,
+      "sps_score": 26.777889,
+      "final_score": 75.423409
+    },
+    "accept_rule": "Local: train completes. Official (only if packaged): Rel-L2 or MVPE +>=0.30 vs E007 Codabench, or final_score > 75.423409, and Time >= 86. Do not retune after seeing official scores."
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_all_valid_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": [],
+  "device": "cuda",
+  "output": "artifacts/e015",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40,
+    "budget_note": "Isolated change versus E004: train membership 56 -> 81 valid real files (3341 windows, about 0.72 epochs). Same 600 updates, init, seed, optimizer, loss. Do not score v1_val as unseen."
+  },
+  "interval": {
+    "alpha": 0.025,
+    "beta": 0.1,
+    "sigma_global": 0.0563870259
+  },
+  "evaluation": {
+    "adaptation": "none",
+    "skip": true,
+    "reason": "all released valid real trajectories are in train; local_bench_v1 is contaminated"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "experiment": "E013",
+  "seed": 0,
+  "hypothesis": "Replacing E004's joint physical u/v relative MSE with the official scored functionals weighted by the published SPS branch weights 0.5 Rel-L2 + 0.3 TKE-rel-L2 + 0.2 official-MVPE-L2, holding every other E004 control fixed, will raise validation Rel-L2 or MVPE by at least 0.30 versus E004, keep the other within 0.25 of E004, keep TKE at least 70.247, and keep Time at least 86 when scored with the frozen E006 interval.",
+  "comparator": "E004/E007 no-adaptation packed FNO on real_regime_v1 validation via local_bench_v1",
+  "decision_criterion": {
+    "rel_l2_or_mvpe_min_gain_vs_e004": 0.30,
+    "other_max_drop_vs_e004": 0.25,
+    "e004": {
+      "rel_l2_score": 94.720,
+      "tke_score": 70.497,
+      "mvpe_score": 95.143
+    },
+    "tke_min": 70.247,
+    "time_min": 86.0,
+    "reported_not_gated": ["sps_score"],
+    "accept_rule": "max(Rel-L2 gain, MVPE gain) >= 0.30 and min(Rel-L2 gain, MVPE gain) >= -0.25 and TKE >= 70.247 and Time >= 86"
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e013",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "official_score_aligned_rel_l2",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "rel_l2_weight": 0.5,
+      "tke_weight": 0.3,
+      "mvpe_weight": 0.2,
+      "formula": "0.5 * official Rel-L2(u,v) + 0.3 * official TKE rel-L2 + 0.2 * official MVPE probe rel-L2",
+      "weight_source": "published SPS branch weights in starting-kit scoring.py / docs/metrics.md",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40,
+    "budget_note": "Isolated change versus E004: joint physical relative MSE -> official 0.5/0.3/0.2 Rel-L2+TKE+MVPE-L2. Same 600 updates, split, init, seed, optimizer. Do not change mix weights after training starts."
+  },
+  "interval": {
+    "alpha": 0.025,
+    "beta": 0.1,
+    "sigma_global": 0.0563870259
+  },
+  "evaluation": {
+    "adaptation": "none",
+    "metric_batch_size": 16,
+    "progress_every": 100
+  }
+}

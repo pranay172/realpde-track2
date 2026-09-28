@@ -1,0 +1,13 @@
+{
+  "data_root": "../RealPDE-Competition-Data",
+  "device": "cuda",
+  "experiment": "E010",
+  "manifest": "configs/splits/real_regime_complement_v1.json",
+  "metric_batch_size": 16,
+  "models": ["persistence"],
+  "output": "artifacts/e010/persistence.json",
+  "partitions": ["val_re", "val_aoa", "val_joint"],
+  "progress_every": 100,
+  "seed": 0,
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt"
+}

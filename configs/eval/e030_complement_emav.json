@@ -1,0 +1,22 @@
+{
+  "experiment": "E030-baseline",
+  "seed": 0,
+  "checkpoint": "artifacts/e030/fno_dual_head_fp16.pth",
+  "manifest": "configs/splits/real_regime_complement_v1.json",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "adaptation": {
+    "gamma": 0.90,
+    "fluct_mode": "emav",
+    "var_gamma": 0.90,
+    "var_sigma": 0.5,
+    "var_min": 0.2,
+    "var_max": 5.0,
+    "dynamics_mode": "none"
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14
+  },
+  "metric_batch_size": 16,
+  "output": "artifacts/e030/complement_emav.json"
+}

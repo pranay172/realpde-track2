@@ -1,0 +1,65 @@
+{
+  "experiment": "E020",
+  "seed": 0,
+  "hypothesis": "An identity-initialized dual-head temporal mean/fluctuation FNO decoder trained on real_regime_v1/train with physical relative MSE will decouple steady wake and zero-mean turbulent fluctuation representations, raising TKE by >= +0.50 while preserving Rel-L2 and MVPE within 0.15 of E007 and maintaining Time >= 86.",
+  "comparator": "E007 frozen no-adaptation FNO + E006 SPS bounds",
+  "decision_criterion": {
+    "tke_gain_gate": 0.50,
+    "rel_l2_drop_limit": 0.15,
+    "mvpe_drop_limit": 0.15,
+    "sps_drop_limit": 0.50,
+    "time_floor": 86.0
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e020",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40
+  },
+  "evaluation": {
+    "adaptation": "streaming_mean_bias_tracking",
+    "gamma": 0.90,
+    "bounds": {
+      "alpha": 0.02,
+      "beta": 0.14
+    },
+    "metric_batch_size": 16,
+    "progress_every": 100
+  }
+}

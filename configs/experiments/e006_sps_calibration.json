@@ -1,0 +1,53 @@
+{
+  "experiment": "E006",
+  "seed": 0,
+  "hypothesis": "A global symmetric interval half=α|pred|+βσ selected by maximum official SPS on frozen E004 residuals from train Re 3750/8850/16500/24150 will raise the one-shot validation SPS by at least 5.0 over E004's 15.024, keep Rel-L2/TKE/MVPE within 0.01 of E004, and regress Time by at most 1.0.",
+  "comparator": "E004 no-adaptation packed FNO with the official default ±5% band",
+  "decision_criterion": {
+    "minimum_calibration_sps_gain_vs_default": 2.0,
+    "minimum_audit_sps_gain_vs_default": 1.0,
+    "minimum_validation_sps": 20.024,
+    "point_score_tolerance": 0.01,
+    "e004_point_scores": {
+      "rel_l2_score": 94.720,
+      "tke_score": 70.497,
+      "mvpe_score": 95.143
+    },
+    "minimum_time_score": 87.167,
+    "reported_not_gated": []
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e006",
+  "interval": {
+    "formula": "half_width = alpha * abs(point_prediction) + beta * sigma_global",
+    "sigma_global": 0.0563870259,
+    "alpha_grid": [0.0, 0.025, 0.05, 0.075, 0.1],
+    "beta_grid": [0.0, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3],
+    "default_alpha": 0.05,
+    "default_beta": 0.0,
+    "selection": "maximum calibration SPS; ties break by smaller mean half-width, then smaller alpha, then smaller beta",
+    "pressure_bounds": "exactly zero",
+    "space": "physical, after official mean_std_real denormalization"
+  },
+  "training_side_calibration": {
+    "calibration_nominal_re": [3750, 8850, 16500, 24150],
+    "audit_nominal_re": "all other real_regime_v1/train Reynolds groups",
+    "window_stride": 20,
+    "batch_size": 4,
+    "preload_trajectories": true,
+    "minimum_calibration_sps_gain_vs_default": 2.0,
+    "minimum_audit_sps_gain_vs_default": 1.0
+  },
+  "evaluation": {
+    "adaptation": "none",
+    "metric_batch_size": 16,
+    "progress_every": 100,
+    "point_predictions": "frozen E004; bounds only change SPS"
+  }
+}

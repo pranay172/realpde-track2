@@ -1,0 +1,28 @@
+{
+  "experiment": "E025",
+  "seed": 0,
+  "hypothesis": "A zero-init linear variance log-ratio head trained on detached frozen-E020 trunk features with the official TKE-form relative loss predicts per-pixel variance maps well enough that deploying it as the fluctuation scale sqrt(V_x*exp(delta)/V_model) raises val TKE by >= 0.50 over the E024-local baseline (77.318) while keeping Rel-L2 within 0.15 of 94.094 and MVPE within 0.15 of 95.665; the point model stays bitwise-E020 because no point-path parameter receives gradients.",
+  "comparator": "E024-local (Rel-L2 94.094 / TKE 77.318 / MVPE 95.665 / SPS 36.450) and E023 emaV on cal",
+  "decision_criterion": {
+    "tke_gain_gate": 0.5,
+    "rel_l2_drop_limit": 0.15,
+    "mvpe_drop_limit": 0.15,
+    "sps_drop_limit": 0.5,
+    "selection_split": "cal (train-side only)",
+    "variants": ["head", "emaV", "geometric blend head*emaV"]
+  },
+  "trunk_checkpoint": "artifacts/e020/fno_dual_head_fp16.pth",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "train_partition": "train",
+  "data": {"preload": true},
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "batch_size": 4,
+    "num_updates": 600,
+    "denominator_floor": 1e-8,
+    "loss": "per-window relative L2 of (Vhat_u + Vhat_v) vs (Vy_u + Vy_v), physical space"
+  },
+  "output": "artifacts/e025",
+  "head_checkpoint_name": "fc_var.pth"
+}

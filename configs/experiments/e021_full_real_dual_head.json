@@ -1,0 +1,66 @@
+{
+  "experiment": "E021",
+  "seed": 0,
+  "skip_eval": true,
+  "hypothesis": "Fine-tuning the E020 dual-head FNO recipe on all 81 valid released real trajectories (3,341 windows), holding every other control fixed, will provide the full-data representation for our official submission candidate with streaming state adaptation, targeting >79+ on Codabench. Local v1_val is not a quality gate because all 81 files are in the train set.",
+  "comparator": "E016 Codabench 93.800 / 69.753 / 91.711 / 89.479 / 26.845 / final 75.497",
+  "decision_criterion": {
+    "local_quality_gate": "none; v1_val and complement_val are contaminated",
+    "local_done": "training completes with finite loss, 81 files / 3341 windows, packed checkpoint under 256 MB",
+    "official_final_min": 76.50,
+    "time_min": 86.0
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_all_valid_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "artifacts/e004/fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": [],
+  "device": "cuda",
+  "output": "artifacts/e021",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40
+  },
+  "evaluation": {
+    "adaptation": "streaming_mean_bias_tracking",
+    "gamma": 0.90,
+    "fluct_scale": 1.50,
+    "bounds": {
+      "alpha": 0.02,
+      "beta": 0.14
+    },
+    "skip": true,
+    "reason": "all released valid real trajectories are in train; local_bench_v1 is contaminated"
+  }
+}

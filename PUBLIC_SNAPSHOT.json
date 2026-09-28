@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "track": 2,
+  "created": "2026-09-28",
+  "source_commit": "f601eee10bf4c0fd26e43b21bad5d5cb8d162eda",
+  "source_history_included": false,
+  "public_author": {
+    "name": "Pranay Vandanapu",
+    "email": "pranayvandanapu2001@gmail.com",
+    "personal_email_publication_approved": true
+  },
+  "kit_directory": "realpde_t2_starting_kit_v6",
+  "excluded": [
+    "realpde_t2_starting_kit_v6/",
+    "competition_docs/",
+    "ENVIRONMENT_SETUP_ARCHIVE.md",
+    "LOCAL_INVENTORY.md",
+    ".git/",
+    "datasets, model artifacts, environments, caches and untracked files"
+  ],
+  "changes": [
+    "Public-facing documentation and dependency acquisition instructions",
+    "Public snapshot checks and data-free CI",
+    "Preserved original environment pins and scientific result records",
+    "Explicit CC BY-NC 4.0 notices for two adapted FNO implementation files",
+    "Cleaned historical whitespace; model/experiment Python ASTs unchanged"
+  ],
+  "reproduction_status": "Source/config recipe retained; model artifacts absent; no fresh end-to-end rerun"
+}

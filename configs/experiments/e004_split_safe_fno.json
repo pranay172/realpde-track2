@@ -1,0 +1,68 @@
+{
+  "experiment": "E004",
+  "seed": 0,
+  "hypothesis": "A packed FNO initialized from the released simulation-only checkpoint and fine-tuned only on real_regime_v1/train, using official mean_std_real normalization and per-window physical relative MSE on scored u/v, will beat E003 persistence on Rel-L2 and MVPE and will not drop TKE below E003 sim-pretrain FNO.",
+  "comparator": "E003 persistence and sim-pretrain FNO; released sim_real_ft FNO remains a leaky diagnostic only",
+  "decision_criterion": {
+    "must_beat_persistence": ["rel_l2_score", "mvpe_score"],
+    "persistence": {
+      "rel_l2_score": 92.164,
+      "tke_score": 72.697,
+      "mvpe_score": 94.427
+    },
+    "tke_floor": {
+      "source": "E003 sim-pretrain FNO",
+      "tke_score": 66.969
+    },
+    "reported_not_gated": ["time_score", "sps_score"]
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e004",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40,
+    "budget_note": "Locked after GPU smoke: batch 4 fit in 2.64 GiB allocated on the RTX 5050. 600 updates keep examples_seen at 2400. Do not change after training starts."
+  },
+  "evaluation": {
+    "adaptation": "none",
+    "bounds": "none; official scorer default +/-5% prediction band",
+    "metric_batch_size": 16,
+    "progress_every": 100
+  }
+}

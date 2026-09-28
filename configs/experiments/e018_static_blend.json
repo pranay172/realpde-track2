@@ -1,0 +1,62 @@
+{
+  "experiment": "E018",
+  "seed": 0,
+  "hypothesis": "A small fixed convex mixture of the split-safe E004 FNO forecast and the current measured-input persistence prior will recover at least 0.50 TKE score while losing at most 0.15 Rel-L2 and MVPE score on trajectory-disjoint train-side calibration and audit windows.",
+  "comparator": "The same frozen E004 FNO with the same frozen E006 SPS interval and w=0.0.",
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "checkpoint_sha256": "75cc07b42bfeb74f2a204dde26650a7f07289c377e35bfe04356f5bbfb9d363c",
+  "train_partition": "train",
+  "validation_partitions": ["val_re", "val_aoa", "val_joint"],
+  "blend": {
+    "formula": "y_w=(1-w)*FNO(x)+w*x in physical u/v/p space, returned in target-normalized space",
+    "weights": [0.0, 0.05, 0.1, 0.15, 0.2, 0.25],
+    "uses_prev_target": false,
+    "adaptation": "none",
+    "selection": "smallest weight whose calibration and audit gates pass; no validation or SPS selection"
+  },
+  "training_side_calibration": {
+    "calibration_nominal_re": [3750, 8850, 16500, 24150],
+    "window_stride": 20,
+    "batch_size": 16,
+    "preload_trajectories": true
+  },
+  "interval": {
+    "kind": "static_e006",
+    "alpha": 0.025,
+    "beta": 0.1,
+    "sigma_global": 0.0563870259,
+    "selection_locked": true,
+    "note": "Use E006 bounds unchanged for every candidate and every post-selection stream; SPS is reported, never tuned."
+  },
+  "selection_gates": {
+    "minimum_tke_score_gain": 0.5,
+    "maximum_rel_l2_score_drop": 0.15,
+    "maximum_mvpe_score_drop": 0.15,
+    "audit_must_pass_same_gates": true
+  },
+  "validation_gates_vs_e007": {
+    "minimum_tke_score_gain": 0.5,
+    "maximum_rel_l2_score_drop": 0.15,
+    "maximum_mvpe_score_drop": 0.15,
+    "minimum_time_score": 86.0,
+    "maximum_sps_score_drop": 0.5,
+    "complementary_point_score_drop_tolerance": 0.15,
+    "complementary_time_score_floor": 86.0
+  },
+  "complementary_stress": {
+    "manifest": "configs/splits/real_regime_complement_v1.json",
+    "checkpoint": "artifacts/e010/fno_fp16.pth",
+    "checkpoint_sha256": "89b2a522f717645f5f03cd3c011c76c810252304f422187936d00006ae9bc2d5",
+    "partitions": ["val_re", "val_aoa", "val_joint"],
+    "comparison": "existing E010 FNO result; this model saw real_regime_v1 validation and is stress evidence only"
+  },
+  "evaluation": {
+    "device": "cuda",
+    "metric_batch_size": 16,
+    "progress_every": 200
+  },
+  "output": "artifacts/e018"
+}

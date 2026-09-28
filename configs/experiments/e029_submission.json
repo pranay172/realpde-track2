@@ -1,0 +1,43 @@
+{
+  "experiment": "E029",
+  "seed": 0,
+  "hypothesis": "Resubmission candidate identical to E024 (E021 full-release dual-head FNO + emaV + frozen (0.02, 0.14) bounds) with two robustness changes after the E024 official run failed without logs: (1) the variance-ratio smoothing is now pure sliced-weighted-sum arithmetic (no conv2d/F.pad/kernel construction \u2014 the only new op surface vs E022, unverifiable on Torch 2.2.2+CUDA locally), mathematically identical (max diff 1.2e-6); (2) the emaV branch is guarded: any unexpected failure degrades that step to E022-equivalent fixed 1.5 scaling (info[emaV_fallbacks] counter) instead of crashing the run. Deployed validation on leakage-safe E020 weights reproduces 94.094/77.318/95.665/36.450 exactly. Leading failure hypothesis for E024 remains the documented Codabench bundle transient.",
+  "comparator": "E022 Codabench baseline (76.499614)",
+  "decision_criterion": {
+    "extracted_max_bytes": 256000000,
+    "must_contain_root_submission_py": true,
+    "bounds_on_every_step": true,
+    "adapt_loss": null,
+    "skip_validation_proxy": true,
+    "official_container_local_eval": true,
+    "deployed_validation": {
+      "config": "configs/eval/e024_emav_e020.json",
+      "expected": {
+        "rel_l2_score": 94.094,
+        "tke_score": 77.318,
+        "mvpe_score": 95.665,
+        "sps_score": 36.45
+      },
+      "tolerance": 0.15
+    }
+  },
+  "checkpoint": "artifacts/e021/fno_dual_head_fp16.pth",
+  "checkpoint_sha256": "3d9a6b93b8634db08b303d220a6a5df48ef35beb84628d8456d8fddc6d903dfe",
+  "wrapper": "submission/e029/submission.py",
+  "adaptation": {
+    "gamma": 0.9,
+    "fluct_mode": "emav",
+    "var_gamma": 0.9,
+    "var_sigma": 0.5,
+    "var_min": 0.2,
+    "var_max": 5.0,
+    "fallback_fluct_scale": 1.5
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14,
+    "sigma_global": 0.0563870259
+  },
+  "output": "artifacts/e029",
+  "archive_name": "e029_candidate.zip"
+}

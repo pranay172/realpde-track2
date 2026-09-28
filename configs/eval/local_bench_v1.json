@@ -1,0 +1,100 @@
+{
+  "name": "local_bench_v1",
+  "purpose": "Compare leakage-safe Track 2 models on the same official-protocol streams before any Codabench upload.",
+  "data_root": "../RealPDE-Competition-Data",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "device": "cuda",
+  "output": "artifacts/local_bench",
+  "anchors": {
+    "codabench_e007": {
+      "rel_l2_score": 93.779908,
+      "tke_score": 69.824232,
+      "mvpe_score": 91.189871,
+      "time_score": 89.437108,
+      "sps_score": 26.777889,
+      "final_score": 75.423409
+    },
+    "local_minus_codabench_e007": {
+      "rel_l2_score": 0.941,
+      "tke_score": 0.673,
+      "mvpe_score": 3.953,
+      "time_score": -2.151,
+      "sps_score": 8.289
+    }
+  },
+  "streams": [
+    {
+      "name": "v1_val",
+      "manifest": "configs/splits/real_regime_v1.json",
+      "partitions": ["val_re", "val_aoa", "val_joint"],
+      "role": "primary_selection_stream"
+    },
+    {
+      "name": "complement_val",
+      "manifest": "configs/splits/real_regime_complement_v1.json",
+      "partitions": ["val_re", "val_aoa", "val_joint"],
+      "role": "stress_stream_for_v1_safe_models_only"
+    }
+  ],
+  "models": [
+    {
+      "name": "persistence",
+      "kind": "persistence",
+      "interval": null,
+      "safe_on": ["v1_val", "complement_val"]
+    },
+    {
+      "name": "e007_fno_e006bounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e004/fno_fp16.pth",
+      "interval": {"alpha": 0.025, "beta": 0.1},
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "Current Codabench baseline wrapper contents"
+    },
+    {
+      "name": "e011_fno_e006bounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e011/fno_fp16.pth",
+      "interval": {"alpha": 0.025, "beta": 0.1},
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "E011 v/MVPE-loss FNO; trained only on real_regime_v1/train"
+    },
+    {
+      "name": "e012_fno_coveragebounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e004/fno_fp16.pth",
+      "interval": {"alpha": 0.025, "beta": 0.15},
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "Frozen E004 with I010/E012 train-only coverage interval; same weights as E007"
+    },
+    {
+      "name": "e013_fno_e006bounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e013/fno_fp16.pth",
+      "interval": {"alpha": 0.025, "beta": 0.1},
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "E013 official score-aligned loss FNO; trained only on real_regime_v1/train"
+    },
+    {
+      "name": "e014_fno_e006bounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e014/fno_fp16.pth",
+      "interval": {"alpha": 0.025, "beta": 0.1},
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "E014 train-scaled official loss FNO; trained only on real_regime_v1/train"
+    },
+    {
+      "name": "e017_fno_onlinebounds",
+      "kind": "packed_fno",
+      "checkpoint": "artifacts/e004/fno_fp16.pth",
+      "interval": {
+        "kind": "online_residual",
+        "alpha": 0.025,
+        "decay": 0.9,
+        "scale": 0.3
+      },
+      "safe_on": ["v1_val", "complement_val"],
+      "note": "E017 rejected online residual-scale interval on frozen E004; same weights as E007"
+    }
+  ]
+}

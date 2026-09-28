@@ -1,0 +1,54 @@
+{
+  "experiment": "E008",
+  "seed": 0,
+  "hypothesis": "One SGD step at 1e-3 on only FNO fc1/fc2, using E004's physical u/v relative MSE and frozen E006 (0.025, 0.1) bounds, will raise Rel-L2 or MVPE by at least 0.15 versus no-adaptation E007 without dropping Rel-L2 below 94.470, MVPE below 94.893, TKE below 70.247, or Time below 82.",
+  "comparator": "E007 local no-adaptation stream on the same real_regime_v1 validation set",
+  "decision_criterion": {
+    "must_gain_at_least_0.15_on_one_of": ["rel_l2_score", "mvpe_score"],
+    "rel_l2_min": 94.470,
+    "mvpe_min": 94.893,
+    "tke_min": 70.247,
+    "time_min": 82.0,
+    "e007": {
+      "rel_l2_score": 94.720,
+      "tke_score": 70.497,
+      "mvpe_score": 95.143,
+      "time_score": 87.286,
+      "sps_score": 35.067
+    },
+    "reported_not_gated": ["sps_score"]
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "checkpoint": "artifacts/e004/fno_fp16.pth",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e008",
+  "adaptation": {
+    "name": "one_step_projection_head_sgd",
+    "optimizer": "SGD",
+    "learning_rate": 0.001,
+    "momentum": 0.0,
+    "adapt_steps": 1,
+    "trainable": "projection_head",
+    "parameter_prefixes": ["fc1.", "fc2."],
+    "batchnorm": "keep_eval_running_stats",
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12
+    },
+    "pairing": "cached previous input with revealed previous target",
+    "reset": "restore E004 weights, new last-layer optimizer, clear cached input"
+  },
+  "interval": {
+    "alpha": 0.025,
+    "beta": 0.1,
+    "sigma_global": 0.0563870259
+  },
+  "evaluation": {
+    "metric_batch_size": 16,
+    "progress_every": 100
+  }
+}

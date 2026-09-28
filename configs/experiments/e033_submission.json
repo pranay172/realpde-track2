@@ -1,0 +1,35 @@
+{
+  "experiment": "E033",
+  "seed": 0,
+  "hypothesis": "E031/E032's validated initialization and training recipe transfers to the official stream with E029's unchanged inference graph.",
+  "comparator": "E029 official final 76.760173",
+  "checkpoint": "artifacts/e033/fno_dual_head_fp16.pth",
+  "checkpoint_sha256": "2e7431c3e24587d5ad94ef6335908cbfb5ba034f86bccb0ec9566a67ddd81080",
+  "wrapper": "submission/e029/submission.py",
+  "decision_criterion": {
+    "extracted_max_bytes": 256000000,
+    "must_contain_root_submission_py": true,
+    "bounds_on_every_step": true,
+    "adapt_loss": null,
+    "skip_validation_proxy": true,
+    "skip_reason": "All valid real trajectories were used for the full-data refit; E032 supplies leakage-safe recipe evidence.",
+    "official_container_local_eval": true,
+    "additional_gate": "scripts/check_deployed_parity.py on the exact extracted archive; no emaV fallbacks; prediction/bound physical differences <=2e-6"
+  },
+  "adaptation": {
+    "gamma": 0.9,
+    "fluct_mode": "emav",
+    "var_gamma": 0.9,
+    "var_sigma": 0.5,
+    "var_min": 0.2,
+    "var_max": 5.0,
+    "fallback_fluct_scale": 1.5
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14,
+    "sigma_global": 0.0563870259
+  },
+  "output": "artifacts/e033",
+  "archive_name": "e033_candidate.zip"
+}

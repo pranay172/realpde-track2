@@ -1,0 +1,61 @@
+{
+  "experiment": "E033",
+  "seed": 0,
+  "initialization": "checkpoint",
+  "hypothesis": "Refitting E031's verified simulation initializer and E032's confirmed regular-grid 1800-update recipe on all valid real trajectories transfers its local gains with unchanged E029 inference cost.",
+  "prerequisite": "Do not run unless E032 stride20_u1800 passes the locked seed1 confirmation gate.",
+  "comparator": "E029 official final 76.760173; exact original archive remains frozen",
+  "decision_criterion": {
+    "local_quality_gate": "E032 two-fold/two-seed evidence only; full-release training has no leakage-safe released-data holdout",
+    "local_done": "81 valid training files, 3341 grid windows, strict simulation load, finite 1800-update loss, packed checkpoint under 256000000 bytes",
+    "submission_gate": "Exact archive, evaluator-compatible replay after adaptation, and pinned offline official-container local_eval must pass",
+    "official_target": "Improve on E029; >80 remains an unverified target, not a local-score inference"
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_all_valid_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": [],
+  "device": "cuda",
+  "output": "artifacts/e033",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; unchanged from E032",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "trajectory_balanced": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 1800,
+    "target_examples": 7200,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40
+  },
+  "evaluation": {
+    "skip": true,
+    "reason": "All 81 valid released real trajectories are in training; use --skip-eval. E029 wrapper and uncertainty constants remain frozen."
+  }
+}

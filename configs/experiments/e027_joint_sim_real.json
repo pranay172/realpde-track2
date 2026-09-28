@@ -1,0 +1,37 @@
+{
+  "experiment": "E027",
+  "seed": 0,
+  "hypothesis": "Jointly fine-tuning the E020 dual-head FNO on mixed real (56 train trajectories, weight 1.0) + simulation (72 strict_regime_train trajectories, weight 0.3) batches with the unchanged E020 recipe improves unseen-regime generalization: v1 parity (Rel-L2 >= 93.944, TKE >= 77.018, MVPE >= 95.515) AND at least one point component +0.30 over E024-local, or complement composite >= 80.93 (E024-complement 80.726 + 0.20).",
+  "comparator": "E024-local (v1: 94.094/77.318/95.665; complement: 95.976/76.770/97.044/46.733, composite 80.726)",
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_v1.json",
+  "real_partition": "train",
+  "sim_partition": "strict_regime_train",
+  "initial_checkpoint": "artifacts/e020/fno_dual_head_fp16.pth",
+  "output": "artifacts/e027",
+  "device": "cuda",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "batch_size": 4,
+    "num_updates": 600,
+    "sim_loss_weight": 0.3,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "pressure_contribution": 0.0
+    }
+  },
+  "adaptation": {
+    "gamma": 0.90,
+    "fluct_mode": "emav",
+    "var_gamma": 0.90,
+    "var_sigma": 0.5
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14
+  }
+}

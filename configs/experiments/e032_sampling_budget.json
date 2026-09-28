@@ -1,0 +1,15 @@
+{
+  "experiment": "E032",
+  "base_config": "configs/experiments/e020_dual_head_fno.json",
+  "folds": ["real_regime_v1", "real_regime_complement_v1"],
+  "strides": [20, 1],
+  "updates": [600, 1800],
+  "seed": 0,
+  "trajectory_balanced": true,
+  "initialization": "Select by E031 locked rule before running E032",
+  "hypothesis": "Random temporal offsets and additional training improve deployed forecasts; a 2x2 design separates their effects.",
+  "gate": "Against stride20/600, candidate must have fold-mean Rel-L2 gain >=0.15 and SPS gain >=0.5, with neither fold losing >0.10 Rel-L2, >0.25 TKE, >0.10 MVPE or >0.25 SPS. Confirm selected recipe and comparator with seed1 on both folds before refit.",
+  "sampling": "Both grid and dense cells sample a trajectory uniformly and an available start uniformly with replacement. Dense starts are consecutive integers, grid starts are multiples of20. Equal trajectory weighting in all four cells.",
+  "selection": "Among passing cells choose highest two-fold mean SPS; ties within0.1 prefer fewer updates then stride20. All evaluations use emaV and frozen bounds; no loss or inference change.",
+  "output": "artifacts/e032"
+}

@@ -1,0 +1,83 @@
+{
+  "experiment": "E030",
+  "seed": 0,
+  "hypothesis": "A spatially pooled, stable ridge-AR(2) forecast fit from the current measured 20-frame input and blended at weight 0.25 into the dual-head FNO fluctuation before emaV will improve coherent fluctuation alignment on a newly trained complement-fold model, raising Rel-L2 and the five-component mean while preserving E029's TKE, mean, uncertainty, and runtime strengths.",
+  "comparator": "The same independently trained complement-fold dual-head checkpoint with mean-bias EMA, emaV, and frozen (0.02, 0.14) bounds but no pooled dynamics donor.",
+  "decision_criterion": {
+    "rel_l2_gain_min": 0.15,
+    "tke_drop_max": 0.0,
+    "mvpe_drop_max": 0.05,
+    "sps_drop_max": 0.25,
+    "time_floor": 86.0,
+    "five_component_mean_gain_min": 0.30,
+    "single_locked_complement_evaluation": true
+  },
+  "data_root": "../RealPDE-Competition-Data",
+  "manifest": "configs/splits/real_regime_complement_v1.json",
+  "stats": "realpde_t2_starting_kit_v6/example_data/mean_std_real.pt",
+  "initial_checkpoint": "../RealPDE-Competition-Data/baseline_checkpoints/sim_pretrain/sim_fno_fp16.pth",
+  "train_partition": "train",
+  "eval_partitions": ["val_re", "val_aoa", "val_joint"],
+  "device": "cuda",
+  "output": "artifacts/e030",
+  "data": {
+    "window_stride": 20,
+    "input_frames": 20,
+    "output_frames": 20,
+    "spatial_stride": 2,
+    "normalization": "official mean_std_real.pt; evaluator-aligned, not recomputed on the train split",
+    "pressure": "exactly zero",
+    "shuffle": true,
+    "num_workers": 0,
+    "pin_memory": true,
+    "preload_trajectories": true
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "betas": [0.9, 0.999],
+    "weight_decay": 0.0,
+    "scheduler": "CosineAnnealingLR",
+    "eta_min": 0.0,
+    "batch_size": 4,
+    "num_updates": 600,
+    "target_examples": 2400,
+    "loss": {
+      "name": "per_window_physical_relative_mse",
+      "measured_channels": 2,
+      "denominator_epsilon": 1e-12,
+      "formula": "mean_batch(sum_t,h,w,c<2((prediction_physical-target_physical)^2) / max(sum_t,h,w,c<2(target_physical^2), epsilon))",
+      "pressure_contribution": 0.0
+    },
+    "precision": "float32",
+    "gradient_clip_norm": 0.0,
+    "checkpoint_selection": "fixed final update; no validation-based early stopping",
+    "maximum_wall_minutes": 40
+  },
+  "adaptation": {
+    "gamma": 0.90,
+    "fluct_mode": "emav",
+    "var_gamma": 0.90,
+    "var_sigma": 0.5,
+    "var_min": 0.2,
+    "var_max": 5.0,
+    "dynamics_mode": "pooled_ar2",
+    "dynamics_blend": 0.25,
+    "dynamics_ridge": 0.0001,
+    "dynamics_max_root": 0.98
+  },
+  "interval": {
+    "alpha": 0.02,
+    "beta": 0.14
+  },
+  "selection_provenance": {
+    "order": "fixed from the smallest shared oscillator model",
+    "ridge_blend": "fixed from E023 train-side cal/audit exploratory replay",
+    "v1_status": "already viewed; diagnostic only and prohibited for E030 selection",
+    "complement_status": "untouched for a model trained on the complement manifest"
+  },
+  "initialization_audit": {
+    "finding": "The historical E020/E021 trainer passed fp16 wrapper dictionaries directly to the dual-head initializer and silently left the model randomly initialized.",
+    "e030_policy": "Unpack the official sim-pretrained fp16 state, require exact key coverage, and verify identity initialization before training. Baseline and pooled-AR candidate share this checkpoint, preserving the mechanism comparison."
+  }
+}
