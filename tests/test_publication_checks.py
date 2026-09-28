@@ -8,7 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from check_archive import DERIVED_FNO_FILES, check_derived_licenses
+from check_archive import DERIVED_FNO_FILES, check_derived_licenses, check_document_links
 
 SPEC = importlib.util.spec_from_file_location(
     "snapshot_audit", Path(__file__).resolve().parents[1] / "scripts/publication_audit.py")
@@ -17,6 +17,60 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class PublicationChecks(unittest.TestCase):
+    def test_html_links_accept_attribute_quotes_and_case(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "target.svg").write_text("<svg />")
+            document = root / "README.md"
+            for attribute in ("src", "href", "SRC", "HREF"):
+                for quote in ('"', "'", ""):
+                    with self.subTest(attribute=attribute, quote=quote):
+                        document.write_text(f"<img {attribute} = {quote}target.svg{quote} />")
+                        self.assertEqual(check_document_links(document), 1)
+
+    def test_missing_html_links_fail_for_both_quote_styles(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            document = Path(tmp) / "README.md"
+            for attribute in ("src", "href"):
+                for quote in ('"', "'"):
+                    with self.subTest(attribute=attribute, quote=quote):
+                        document.write_text(f"<a {attribute}={quote}missing.svg{quote}>x</a>")
+                        with self.assertRaisesRegex(ValueError, "Missing reader-doc link"):
+                            check_document_links(document)
+
+    def test_links_resolve_relative_to_nested_document(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            nested = root / "docs"
+            nested.mkdir()
+            (root / "LICENSE").write_text("Synthetic license fixture\n")
+            (nested / "figure & preview.svg").write_text("<svg />")
+            document = nested / "README.md"
+            document.write_text(
+                '[License](../LICENSE#scope)\n'
+                '<img src="figure%20&amp;%20preview.svg?raw=1#panel" />\n'
+                '[Preview](figure%20%26%20preview.svg?raw=1#panel)\n'
+            )
+            self.assertEqual(check_document_links(document), 3)
+
+    def test_external_links_and_same_page_anchors_are_not_file_checks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            document = Path(tmp) / "README.md"
+            document.write_text(
+                '[Remote](https://example.org/missing.md)\n'
+                '<img src="//example.org/missing.svg" />\n'
+                '<a href="mailto:realpde-competition@googlegroups.com">Contact</a>\n'
+                '[Section](#section)\n<a href="?plain=1#section">View</a>\n'
+            )
+            self.assertEqual(check_document_links(document), 0)
+
+    def test_markdown_links_still_reject_missing_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            document = Path(tmp) / "README.md"
+            document.write_text('[Missing](missing.md#section)\n')
+            with self.assertRaisesRegex(ValueError, "Missing reader-doc link"):
+                check_document_links(document)
+
     def _license_fixture(self, root):
         for name in DERIVED_FNO_FILES:
             destination = root / name
