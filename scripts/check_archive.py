@@ -15,6 +15,31 @@ READER_DOCS = (
     "PUBLICATION_AUDIT.md", "LICENSING.md", "ACKNOWLEDGMENTS.md",
     "THIRD_PARTY_NOTICES.md", "EXTERNAL_DEPENDENCIES.md",
 )
+DERIVED_FNO_FILES = (
+    "src/realpde_t2/dual_head_fno.py",
+    "src/realpde_t2/variance_head_fno.py",
+    "submission/e021/submission.py",
+    "submission/e024/submission.py",
+    "submission/e029/submission.py",
+)
+
+
+def check_derived_licenses(root: Path) -> int:
+    """Guard known copied/adapted FNO implementations, including standalone copies."""
+    inventory = (root / "LICENSING.md").read_text()
+    required = (
+        "# SPDX-License-Identifier: CC-BY-NC-4.0",
+        "RealPDEBench", "Zongyi Li", "# Modified",
+        "LICENSING.md", "THIRD_PARTY_NOTICES.md",
+        "not covered by the root MIT grant",
+    )
+    for name in DERIVED_FNO_FILES:
+        header = "\n".join((root / name).read_text().splitlines()[:4])
+        if not all(marker in header for marker in required):
+            raise ValueError(f"Missing derived-source license/attribution header: {name}")
+        if f"- `{name}`" not in inventory:
+            raise ValueError(f"Missing derived-source license inventory entry: {name}")
+    return len(DERIVED_FNO_FILES)
 
 
 def main():
@@ -28,6 +53,7 @@ def main():
         if p.suffix == ".json":
             json.loads(p.read_text())
             counts["json"] += 1
+    counts["derived_license_files"] = check_derived_licenses(ROOT)
     for name in READER_DOCS:
         for target in re.findall(r"\]\(([^)]+)\)", (ROOT / name).read_text()):
             if "://" in target or target.startswith(("#", "mailto:")):
@@ -54,7 +80,8 @@ def main():
             raise ValueError(f"Unexpected Python snapshot: {env}")
         counts["pins"] += len(pins)
     print(json.dumps({"status": "passed", "checks": counts,
-                      "scope": "syntax, JSON, reader links, environment pins/checksums; no model tests"},
+                      "scope": "syntax, JSON, reader links, environment pins/checksums, "
+                               "known derived-source notices; no model tests"},
                      indent=2))
 
 

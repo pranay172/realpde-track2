@@ -38,10 +38,6 @@ datasets/
 checkpoints/
 ckpts/
 
-# Keep the small organizer-provided examples required by the tracked v6 kit.
-!realpde_t2_starting_kit_v6/example_data/mean_std_real.pt
-!realpde_t2_starting_kit_v6/example_data/test_real/*.h5
-
 # Generated experiments and submission packages
 artifacts/
 outputs/

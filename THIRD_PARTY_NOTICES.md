@@ -11,8 +11,9 @@ official or endorsed organizer release.
   external dependency, not bundled here.
 - Alex Rogozhnikov: einops, an external dependency with its own MIT notice.
 
-The retained adapted FNO files and their modifications are explicitly listed
-in [LICENSING.md](LICENSING.md). They remain CC BY-NC 4.0.
+The five retained adapted FNO files (two model modules and three standalone
+submission wrappers) and their modifications are explicitly listed in
+[LICENSING.md](LICENSING.md). They remain CC BY-NC 4.0.
 
 The [preserved benchmark license notice](third_party_licenses/RealPDEBench-LICENSE.txt)
 links to the full [CC BY-NC 4.0 legal code](https://creativecommons.org/licenses/by-nc/4.0/legalcode).

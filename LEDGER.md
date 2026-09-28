@@ -20,6 +20,13 @@ in `PUBLIC_SNAPSHOT.json`. Fresh `main` history uses this identity; old private
 history is not imported. The audit allows only that explicit personal-email
 exception plus GitHub no-reply addresses. No remote or push is authorized here.
 
+Final-review fixes: added CC BY-NC 4.0 attribution to the three standalone FNO
+wrappers and reconciled the five-file inventory; added release regression guards
+and a separate rebuilt-checkpoint packaging procedure. All 15 dependency-free
+tests and archive/privacy checks pass; model/experiment ASTs and historical
+configs are unchanged. Ready as a source-only research archive, not a fresh
+model reproduction. See `PUBLICATION_AUDIT.md`; no publication was performed.
+
 ## Maintenance rules
 
 - Use monotonic IDs: `E###` for experiments, `I###` for ideas, and `D###` for

@@ -11,13 +11,22 @@ The following files include FNO forward/trunk logic adapted from RealPDEBench:
 
 - `src/realpde_t2/dual_head_fno.py`
 - `src/realpde_t2/variance_head_fno.py`
+- `submission/e021/submission.py`
+- `submission/e024/submission.py`
+- `submission/e029/submission.py`
 
-These two adapted files are distributed under **CC BY-NC 4.0**, not the root
+These five adapted files are distributed under **CC BY-NC 4.0**, not the root
 MIT grant. Credit: Zongyi Li (original FNO implementation) and RealPDEBench
 contributors. Our changes add separate temporal-mean/fluctuation projections,
-checkpoint conversion, and an experimental variance head. The two files carry
-explicit attribution and license headers. Their external base implementation
-is not bundled.
+checkpoint conversion, an experimental variance head, and streaming adaptation.
+The three standalone submission wrappers embed adapted FNO forward logic;
+they are not merely import-only clients of the external model. All five files
+carry explicit attribution, modification, and license headers. Their external
+base implementation is not bundled.
+
+Publication headers do not change Python implementation ASTs, but do change
+source bytes. Historical wrapper/archive hashes identify the original scored
+artifacts, not packages rebuilt from this public snapshot.
 
 The kit's FNO source was compared with the locally pinned benchmark source:
 only the two package import paths differed. Benchmark source commit:

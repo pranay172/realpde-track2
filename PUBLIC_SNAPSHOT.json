@@ -22,7 +22,8 @@
     "Public-facing documentation and dependency acquisition instructions",
     "Public snapshot checks and data-free CI",
     "Preserved original environment pins and scientific result records",
-    "Explicit CC BY-NC 4.0 notices for two adapted FNO implementation files",
+    "Explicit CC BY-NC 4.0 notices for five adapted FNO files: two model modules and three submission wrappers",
+    "Release guard for the five-file license inventory and separate rebuilt-checkpoint packaging instructions",
     "Cleaned historical whitespace; model/experiment Python ASTs unchanged"
   ],
   "reproduction_status": "Source/config recipe retained; model artifacts absent; no fresh end-to-end rerun"

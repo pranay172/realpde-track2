@@ -14,23 +14,37 @@ and all untracked source-workspace files. The source/configurations, results,
 limitations, experiment notes, and dependency pins remain. Historical artifact
 paths and private commit hashes are provenance only.
 
-Two retained FNO-derived files have explicit CC BY-NC 4.0 attribution; see
+Five retained FNO-derived files have explicit CC BY-NC 4.0 attribution; see
 [LICENSING.md](LICENSING.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 Removing the kit does not make the external model/data stack unrestricted MIT.
 
 ## Re-run before publication
 
 Local checks passed on 2026-09-28: 162 source files scanned; 64 Python / 42 JSON
-parsed; 37 reader links; 70 dependency pins and 4 checksum records. Eight release
+parsed; 37 reader links; 70 dependency pins and 4 checksum records. Eleven release
 guard tests and four sampling-summary tests passed. No heuristic privacy/payload
 findings. Fresh `main` history is initialized for the public snapshot. The owner
 explicitly approved Pranay Vandanapu and the personal email recorded in
 `PUBLIC_SNAPSHOT.json` for public author/committer metadata. Re-run the history
 audit after committing and before publishing. CI has not run remotely.
 
-138 retained files match the private archive byte-for-byte; all model/experiment
-Python ASTs match. The two model-file edits add attribution comments only;
-other historical whitespace cleanup preserves Markdown hard breaks.
+134 retained files match the private archive byte-for-byte; all model/experiment
+Python ASTs match. The two model-module and three submission-wrapper edits add
+attribution comments only; other historical whitespace cleanup preserves
+Markdown hard breaks. Wrapper/archive bytes rebuilt from this snapshot differ
+from historical artifacts even when prediction logic is unchanged.
+
+Final-review fixes: the three embedded FNO copies in the E021/E024/E029 wrappers
+are now covered explicitly, and the archive checker enforces attribution and
+inventory entries for all five known derived files. Regression tests remove
+each header and inventory entry in turn and verify rejection. Reproduction
+instructions use a separate local rebuild config with a verified new checkpoint
+hash and fresh output/archive names; historical controls and the packaging hash
+guard remain unchanged. Stale example-inclusion wording was removed.
+
+The public history consists of its initial snapshot plus a publication-fix
+commit; private development history remains excluded. Publication readiness is
+for a source-only research archive, not freshly reproduced model results.
 
 ```bash
 python3 scripts/check_archive.py
@@ -41,7 +55,8 @@ python3 -m unittest discover -s tests -p test_sampling_study_summary.py
 
 The checks require only Python, plus Git if a local repository has been
 initialized. They verify syntax/JSON, reader-facing local links, environment
-pin/checksum consistency, forbidden payloads, symbolic links, personal paths,
+pin/checksum consistency, the five known derived-source notices, forbidden
+payloads, symbolic links, personal paths,
 and a limited set of credential patterns. An initialized snapshot additionally
 checks all reachable Git blobs and author/committer emails. Unknown email
 identities are flagged unless they use GitHub no-reply addresses or the owner's

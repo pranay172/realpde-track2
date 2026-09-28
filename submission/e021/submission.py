@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: CC-BY-NC-4.0
+# FNO trunk/forward logic adapted from RealPDEBench (original FNO: Zongyi Li).
+# Modified for dual mean/fluctuation heads and streaming state adaptation.
+# See LICENSING.md and THIRD_PARTY_NOTICES.md; not covered by the root MIT grant.
 """Track 2 Candidate Submission: Full-Release Dual-Head FNO + Streaming State Adaptation."""
 
 from __future__ import annotations

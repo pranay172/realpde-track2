@@ -73,19 +73,59 @@ conversion checks are in [E033_RESULTS.md](docs/E033_RESULTS.md).
 This is full-data training; any evaluation on those public trajectories is not
 held-out generalization evidence.
 
-Once training produces the required packed checkpoint:
+### Package a rebuilt checkpoint under a new identity
+
+`configs/experiments/e033_submission.json` is historical evidence: its
+`checkpoint_sha256` identifies the deleted original E033 checkpoint.
+`package_submission.py` deliberately rejects different bytes. Retraining the
+same recipe does not guarantee a byte-identical checkpoint, so do not use that
+historical config unchanged or disable the hash guard.
+
+After training completes, inspect `artifacts/e033/training_report.json`: verify
+the intended config, successful strict initialization, 81 valid trajectories,
+1800 updates and finite loss. Compute the new packed checkpoint's identity and
+confirm it equals the report's `checkpoint_sha256`:
+
+```bash
+sha256sum artifacts/e033/fno_dual_head_fp16.pth
+```
+
+Make a local copy of `configs/experiments/e033_submission.json` at
+`artifacts/e033/rebuild_submission.json` (do not overwrite an existing rebuild
+config). Edit these fields, leaving all adaptation, interval and validation
+settings unchanged:
+
+```json
+{
+  "experiment": "E033_REBUILD",
+  "checkpoint": "artifacts/e033/fno_dual_head_fp16.pth",
+  "checkpoint_sha256": "<replace with the verified 64-character SHA-256 above>",
+  "output": "artifacts/e033_rebuild",
+  "archive_name": "e033_rebuild_candidate.zip"
+}
+```
+
+This is a field-edit example, not a complete config. Replace the placeholder;
+retain every other field from the copied historical config. Paths resolve from
+the repository root, not the config's directory. The output directory must be
+unused; choose another rebuild name throughout these instructions if it exists.
+Keep the new config and training report together as provenance. Recording a new
+hash identifies bytes; it does **not** establish model correctness or recover
+E033's official score. Run the restored-environment tests below, then the
+packaging and parity gates:
 
 ```bash
 ../.venv/bin/python scripts/package_submission.py \
-  --config configs/experiments/e033_submission.json --skip-full-eval --device cpu
+  --config artifacts/e033/rebuild_submission.json --skip-full-eval --device cpu
 ../.venv/bin/python scripts/check_deployed_parity.py \
-  --submission artifacts/e033/extracted --output artifacts/e033/parity_report.json
+  --submission artifacts/e033_rebuild/extracted --output artifacts/e033_rebuild/parity_report.json
 ```
 
 Inspect scripts/configuration before running: packaging invokes contract/container
 checks and writes generated artifacts. Use a fresh output directory rather than
 overwriting a valuable package. The original archive hash identifies historical
-bytes; a rebuilt archive is a new artifact requiring verification.
+bytes; a rebuilt archive is a new artifact requiring verification. License-only
+header additions also change wrapper/archive bytes without changing model logic.
 
 ## Restored-environment tests
 

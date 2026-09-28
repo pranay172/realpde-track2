@@ -40,8 +40,9 @@ See [E032](docs/E032_RESULTS.md) for full factorial controls.
 
 Historical E033 archive SHA:
 `50a5b3dc2550b4129eabfe917085e98aedceb0224188c21e269856ae60b6ba93`.
-The archive and trained checkpoint were deleted. The organizer's small tracked
-examples are smoke assets, not the original training release or a clean audit.
+The archive and trained checkpoint were deleted. The organizer's small examples
+are external smoke-test dependencies, not included in this snapshot and not
+the original training release or a clean audit.
 
 See [E033](docs/E033_RESULTS.md) for official scores, runtime qualifications,
 packed-model provenance and reproduction commands. The remaining final-score

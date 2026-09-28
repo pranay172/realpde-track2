@@ -3,7 +3,12 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import subprocess
+import sys
 import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from check_archive import DERIVED_FNO_FILES, check_derived_licenses
 
 SPEC = importlib.util.spec_from_file_location(
     "snapshot_audit", Path(__file__).resolve().parents[1] / "scripts/publication_audit.py")
@@ -12,6 +17,43 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class PublicationChecks(unittest.TestCase):
+    def _license_fixture(self, root):
+        for name in DERIVED_FNO_FILES:
+            destination = root / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            header = "\n".join((ROOT / name).read_text().splitlines()[:4])
+            destination.write_text(header + "\n")
+        (root / "LICENSING.md").write_text((ROOT / "LICENSING.md").read_text())
+
+    def test_all_five_derived_files_have_notices(self):
+        self.assertEqual(check_derived_licenses(ROOT), 5)
+        self.assertEqual(set(DERIVED_FNO_FILES), {
+            "src/realpde_t2/dual_head_fno.py", "src/realpde_t2/variance_head_fno.py",
+            "submission/e021/submission.py", "submission/e024/submission.py",
+            "submission/e029/submission.py",
+        })
+
+    def test_each_derived_header_is_required(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in DERIVED_FNO_FILES:
+                with self.subTest(path=name):
+                    self._license_fixture(root)
+                    (root / name).write_text("# No attribution in synthetic fixture\n")
+                    with self.assertRaisesRegex(ValueError, "license/attribution header"):
+                        check_derived_licenses(root)
+
+    def test_each_derived_inventory_entry_is_required(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in DERIVED_FNO_FILES:
+                with self.subTest(path=name):
+                    self._license_fixture(root)
+                    inventory = root / "LICENSING.md"
+                    inventory.write_text(inventory.read_text().replace(f"- `{name}`", ""))
+                    with self.assertRaisesRegex(ValueError, "inventory entry"):
+                        check_derived_licenses(root)
+
     def test_source_only_folder_passes_without_git(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
